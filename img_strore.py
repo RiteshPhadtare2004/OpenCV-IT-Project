@@ -1,24 +1,31 @@
-import cv2 #pip install opencv-contrib-python
-cam = cv2.VideoCapture(0)
-detector=cv2.CascadeClassifier('haarcascade.xml')
+import cv2
 
+# Use cv2.VideoCapture with CAP_DSHOW backend
+cam = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 
+if not cam.isOpened():
+    print("Error: Could not open camera.")
+    exit()
 
-Id=input('enter your id')
-sampleNum=0
-while(True):
-    ret, img = cam.read()
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    faces = detector.detectMultiScale(gray, 1.3, 5)
-    for (x,y,w,h) in faces:
-        cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
-        
-        #saving the captured face in the dataset folder
-        cv2.imwrite("User/User."+Id +'.'+ str(sampleNum) + ".jpg", gray[y:y+h,x:x+w])
-        sampleNum=sampleNum+1
-        cv2.imshow('frame',img)
-    # break if the sample number is morethan 20
-    if sampleNum>60:
+while True:
+    # Capture frame-by-frame
+    ret, frame = cam.read()
+
+    if not ret:
+        print("Failed to capture frame")
         break
+
+    # Convert the frame to grayscale
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    # Display the original and grayscale frames
+    cv2.imshow('Original', frame)
+    cv2.imshow('Grayscale', gray)
+
+    # Break the loop if 'q' key is pressed
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+# Release the camera and close all OpenCV windows
 cam.release()
 cv2.destroyAllWindows()
